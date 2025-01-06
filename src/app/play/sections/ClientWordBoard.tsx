@@ -1,5 +1,6 @@
 'use client';
 import { cn } from '@/app/utils/tailwind';
+import Button from '@/components/Button';
 import React, { useState } from 'react';
 
 interface ClientWordSearchDivProps {
@@ -39,6 +40,8 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoard 
 
 		console.log('startPos', startPos);
 		console.log('endPos', endPos);
+		// 시작점과 끝점 사이를 잇는 선을 그린다.
+
 		setEndPos(null);
 		setStartPos(null);
 
@@ -78,11 +81,11 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoard 
 		>
 			{initialBoard.map((row, rowIndex) =>
 				row.map((letter, colIndex) => (
-					<button
+					<Button
 						key={`${rowIndex}-${colIndex}`}
 						data-row={rowIndex}
 						data-col={colIndex}
-						className={`flex-grow-0 w-[90%] h-[80%] shadow-[0px_7px_0px_0px_rgba(0,0,0,0.25)] rounded-[20px] border border-gray-300 flex items-center justify-center font-bold text-2xl md:text-4xl ${isCellHighlighted(rowIndex, colIndex) ? 'bg-blue-200 ' : 'bg-white'
+						className={`${isCellHighlighted(rowIndex, colIndex) ? 'bg-blue-200 ' : 'bg-white'
 							}`}
 						onMouseDown={() => handleInteractionStart(rowIndex, colIndex)}
 						onMouseEnter={(e) => handleInteractionMove(e)}
@@ -92,7 +95,7 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoard 
 						onTouchEnd={handleInteractionEnd}
 					>
 						{letter}
-					</button>
+					</Button>
 				))
 			)}
 		</div>
