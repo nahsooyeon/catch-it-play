@@ -1,7 +1,8 @@
 'use client';
-import { BoardResDto, positionType } from '@/app/dto/board.res.dto';
+import { useCountdownContext } from '@/app/context/Countdown';
+import { BoardResDto, positionType } from '@/dto/board.res.dto';
 import { cn } from '@/app/utils/tailwind';
-import React, { MouseEvent, useCallback, useMemo, useState } from 'react';
+import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 interface ClientWordSearchDivProps {
 	initialBoardData: BoardResDto;
@@ -11,6 +12,8 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 	const [isSelecting, setIsSelecting] = useState(false);
 	const [startPos, setStartPos] = useState<positionType | null>(null);
 	const [endPos, setEndPos] = useState<positionType | null>(null);
+	const { start, } = useCountdownContext();
+
 	const { grid, words } = initialBoardData;
 
 	const memoizedWords = useMemo(() => {
@@ -23,6 +26,11 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 
 	}, [words]);
 
+	useEffect(() => {
+		start();
+
+	}, [start]);
+
 
 	const handleInteractionStart = (row: number, col: number) => {
 		setIsSelecting(true);
@@ -31,7 +39,6 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 	};
 
 	const checkIsWordCorrect = (start: positionType, end: positionType) => {
-
 		const answer = memoizedWords.words.find((word) => {
 			const isStartCorrect = word.start.x === start.x && word.start.y === start.y;
 			const isEndCorrect = word.end.x === end.x && word.end.y === end.y;
@@ -39,6 +46,7 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 		});
 
 		if (answer) {
+			memoizedWords.correctedList.push(answer.word);
 			const startButton = document.querySelector(`button[data-row="${start.y}"][data-col="${start.x}"]`);
 			const endButton = document.querySelector(`button[data-row="${end.y}"][data-col="${end.x}"]`);
 
@@ -67,6 +75,7 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 				line.style.top = `${startY + startRect.height / 2}px`;
 
 				document.body.appendChild(line);
+
 
 			}
 		}
@@ -127,14 +136,14 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 		return false;
 	};
 
+
+
 	return (
-		<section className={"md:flex-row flex-col flex gap-4"}>
-			<div style={{
-				boxShadow: '0px 7px 0px 0px rgba(0, 0, 0, 0.25)',
-			}} className={"bg-white flex h-max gap-3 flex-wrap lg:max-w-[40svw] flex-grow-0 rounded-xl p-8"}>
+		<section className={"md:flex-row flex-col bg-[#EDEDED]  md:mt-10 items-center flex gap-4"}>
+			<div className={"bg-white flex h-max shadow-bottom gap-3 flex-wrap lg:max-w-[40svw] px-4 flex-grow-0 rounded-xl mt-8 md:p-8"}>
 				{memoizedWords.list.map((word) => (
 					<div data-value={word}
-						className={cn("md:text-5xl text-3xl leading-normal text-black font-normal",
+						className={cn("md:text-5xl text-3xl leading-snug text-black font-normal",
 							memoizedWords.correctedList.find((correctedWord) => correctedWord === word) ? 'line-through text-gray-400' : ''
 						)} key={word}>
 						{word}
@@ -142,11 +151,10 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 				))}
 			</div>
 			<div
-				className={cn("grid size-[100svw] md:size-[36rem] justify-items-center items-top select-none",
-					"grid-cols-[repeat(8,_12.5svw)] grid-rows-[repeat(8,_12.5svw)]",
+				className={cn("grid size-[80svw] md:size-[36rem] justify-items-center items-top select-none",
+					"grid-cols-[repeat(8,_10svw)] grid-rows-[repeat(8,_10svw)]",
 					"md:grid-cols-8 md:grid-rows-8"
 				)}
-			// onMouseLeave={handleInteractionEnd}
 			>
 				{grid.map((row, rowIndex) =>
 					row.map((letter, colIndex) => (
