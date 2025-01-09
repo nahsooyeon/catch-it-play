@@ -1,4 +1,4 @@
-import { BoardResDto } from "@/app/dto/board.res.dto";
+import { BoardResDto } from "@/dto/board.res.dto";
 import ClientWordBoard from "./ClientWordBoard";
 
 const getServerSideBoard = async () => {
