@@ -5,6 +5,9 @@ const getServerSideBoard = async () => {
 	try {
 		const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/game`, {
 			method: 'POST',
+			body: JSON.stringify({
+				seed: Math.random()
+			}),
 		});
 		const data: BoardResDto = await response.json();
 		return data;
