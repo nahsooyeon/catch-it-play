@@ -2,7 +2,7 @@
 import { useCountdownContext } from '@/app/context/Countdown';
 import { BoardResDto, positionType } from '@/dto/board.res.dto';
 import { cn } from '@/app/utils/tailwind';
-import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {  useCallback, useEffect, useMemo, useState } from 'react';
 
 interface ClientWordSearchDivProps {
 	initialBoardData: BoardResDto;
@@ -100,13 +100,12 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 			setEndPos({ x: col, y: row });
 		}
 
-		if ('preventDefault' in e) e.preventDefault();
 	};
 
 
 
-	const handleMouseInteractionEnd = (e: MouseEvent) => {
-		e.preventDefault();
+	const handleMouseInteractionEnd = () => {
+		// e.preventDefault();
 		setIsSelecting(false);
 		if (startPos && endPos)
 			checkIsWordCorrect(startPos, endPos);
@@ -167,10 +166,10 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 								}`)}
 							onMouseDown={() => handleInteractionStart(rowIndex, colIndex)}
 							onMouseEnter={(e) => handleInteractionMove(e)}
-							onMouseUp={(e) => handleMouseInteractionEnd(e)}
+							onMouseUp={() => handleMouseInteractionEnd()}
 							onTouchStart={() => handleInteractionStart(rowIndex, colIndex)}
 							onTouchMove={handleInteractionMove}
-							onTouchEnd={(e) => handleInteractionMove(e)}
+							onTouchEnd={() => handleMouseInteractionEnd()}
 						>
 							{letter}
 						</button>
