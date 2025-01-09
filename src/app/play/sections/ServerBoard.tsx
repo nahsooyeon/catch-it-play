@@ -7,7 +7,7 @@ const getServerSideBoard = async () => {
 			method: 'POST',
 		});
 		const data: BoardResDto = await response.json();
-		return data.grid;
+		return data;
 	} catch (error) {
 		console.error(error);
 		throw new Error('Failed to fetch board data');
@@ -18,7 +18,7 @@ const getServerSideBoard = async () => {
 const ServerSideBoard = async () => {
 	const board = await getServerSideBoard();
 
-	return <ClientWordBoard initialBoard={board} />;
+	return <ClientWordBoard initialBoardData={board} />;
 };
 
 export default ServerSideBoard;
