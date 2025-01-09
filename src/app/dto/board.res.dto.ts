@@ -1,10 +1,11 @@
+export type positionType = {
+  x: number;
+  y: number;
+};
 export interface BoardResDto {
   seed: string;
   grid: string[][];
-  gridsize: {
-    x: number;
-    y: number;
-  };
+  gridsize: positionType;
   wordlist: string[];
   words: wordType[];
 }
@@ -12,12 +13,6 @@ export interface BoardResDto {
 type wordType = {
   word: string;
   direction: number;
-  start: {
-    x: number;
-    y: number;
-  };
-  end: {
-    x: number;
-    y: number;
-  };
+  start: positionType;
+  end: positionType;
 };
