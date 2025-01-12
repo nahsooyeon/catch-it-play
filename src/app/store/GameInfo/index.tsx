@@ -17,6 +17,9 @@ export const GameInfoStore = create<GameStoreProps>((set, get) => ({
 	addPoints: (points: number) => {
 		set({ points: get().points + points });
 	},
-	reset: () => set({ level: null, points: 0 }),
+	reset: () => {
+		set({ level: null, points: 0 });
+		
+	},
 
 }));

@@ -1,10 +1,12 @@
 'use client';
-import { useCountdownContext } from '@/app/context/Countdown';
+import { useCountdownContext } from '@/context/Countdown';
 import { BoardResDto, positionType } from '@/dto/board.res.dto';
 import { cn } from '@/app/utils/tailwind';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand';
 import { GameInfoStore } from '@/app/store/GameInfo';
+import RankFormModal from './widgets/RankForm';
+import { modalStore } from '@/context/Modal';
 
 interface ClientWordSearchDivProps {
 	initialBoardData: BoardResDto;
@@ -14,9 +16,9 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 	const [isSelecting, setIsSelecting] = useState(false);
 	const [startPos, setStartPos] = useState<positionType | null>(null);
 	const [endPos, setEndPos] = useState<positionType | null>(null);
-	const { start, isCountdown } = useCountdownContext();
+	const { start, isCountdown, reset, count, defaultCount } = useCountdownContext();
 	const { addPoints } = useStore(GameInfoStore);
-
+	const { openModal, list } = useStore(modalStore);
 	const { grid, words } = initialBoardData;
 
 	const memoizedWords = useMemo(() => {
@@ -31,8 +33,14 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 
 	useEffect(() => {
 		start();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
-	}, [start]);
+	useEffect(() => {
+		if (isCountdown && count === 0 && list.size === 0) {
+			openModal(<RankFormModal usedTime={defaultCount} solvedCount={memoizedWords.correctedList.length} entireCount={memoizedWords.words.length} id={'rankForm'} />);
+		}
+	}, [isCountdown, count, openModal, memoizedWords.correctedList.length, memoizedWords.words.length, list.size, defaultCount]);
 
 
 	const handleInteractionStart = (row: number, col: number) => {
@@ -64,7 +72,7 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 
 				const line = document.createElement('div');
 				line.style.position = 'absolute';
-				line.style.zIndex = '10';
+				line.style.zIndex = '1';
 				line.style.width = `${Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2)}px`;
 				line.style.height = '8px';
 				line.style.backgroundColor = 'rgba(178, 48, 80, 0.60)';
@@ -78,9 +86,14 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 				line.style.top = `${startY + startRect.height / 2}px`;
 
 				document.body.appendChild(line);
-
-
 			}
+
+			if (memoizedWords.correctedList.length === memoizedWords.words.length) {
+				reset();
+				openModal(<RankFormModal usedTime={defaultCount - count} solvedCount={memoizedWords.correctedList.length} entireCount={memoizedWords.words.length} id={'rankForm'} />);
+			}
+
+
 		}
 
 		setStartPos(null);

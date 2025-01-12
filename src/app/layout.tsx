@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ModalContextProvider, ModalProvider } from "./context/Modal";
-import { CountdownProvider } from "./context/Countdown";
+import { ModalProvider } from "../context/Modal";
+import { CountdownProvider } from "../context/Countdown";
 
 const Bhavuka = localFont({
   src: "./fonts/Bhavuka.woff",
@@ -33,11 +33,9 @@ export default function RootLayout({
         className={`${Bhavuka.className} `}
       >
         <CountdownProvider>
-          <ModalContextProvider>
-            {children}
-            <div id="modal-root" />
-            <ModalProvider />
-          </ModalContextProvider>
+          <div id="modal-root" />
+          {children}
+          <ModalProvider />
         </CountdownProvider>
       </body>
     </html>
