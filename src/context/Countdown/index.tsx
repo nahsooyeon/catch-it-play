@@ -6,10 +6,10 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 interface CountdownContextProps {
 	isCountdown: number | null;
 	count: number;
+	defaultCount: number;
 	start: () => void;
 	stop: () => void;
 	reset: () => void;
-	remaining: number;
 	setCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
@@ -17,7 +17,7 @@ const CountdownContext = createContext<CountdownContextProps | undefined>(undefi
 
 export const CountdownProvider: React.FC<{ children: React.ReactNode; }> = ({ children }) => {
 	const countdown = 180000; // Default countdown value
-	const interval = 1000; // Default interval value
+	const interval = 100; // Default interval value
 
 	const intervalRef = useRef<number>(-1);
 	const [count, setCount] = useState<number>(countdown);
@@ -43,16 +43,15 @@ export const CountdownProvider: React.FC<{ children: React.ReactNode; }> = ({ ch
 	}, [count]);
 
 	const start = () => setIsCountdown(interval);
-	const stop = () => setIsCountdown(null);
+	const stop = () => { setIsCountdown(null); };
 	const reset = () => {
 		setCount(countdown);
 		setIsCountdown(null);
 	};
 
-	const remaining = countdown - count;
 
 	return (
-		<CountdownContext.Provider value={{ isCountdown, count, start, stop, reset, remaining, setCount }}>
+		<CountdownContext.Provider value={{ isCountdown, count, start, stop, reset, setCount, defaultCount: countdown }}>
 			{children}
 		</CountdownContext.Provider>
 	);

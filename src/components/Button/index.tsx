@@ -1,3 +1,5 @@
+"use client";
+
 import { ButtonHTMLAttributes, forwardRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/app/utils/tailwind";
@@ -7,7 +9,7 @@ const ButtonVariants = cva(
 	"", {
 	variants: {
 		theme: {
-			alphabet: "flex-grow-0 w-[90%] h-[80%] shadow-[0px_7px_0px_0px_rgba(0,0,0,0.25)] rounded-[20px] border border-gray-300 flex items-center justify-center font-bold text-2xl md:text-4xl",
+			alphabet: "flex-grow-0 w-[90%] h-[80%] shadow-[0px_7px_0px_0px_rgba(0,0,0,0.25)] rounded-[20px] border border-gray-300 flex items-center justify-center font-bold text-2xl lg:text-4xl",
 			primary: "bg-gray-500 text-white",
 		}
 	},

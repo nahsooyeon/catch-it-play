@@ -1,8 +1,12 @@
 'use client';
-import { useCountdownContext } from '@/app/context/Countdown';
+import { useCountdownContext } from '@/context/Countdown';
 import { BoardResDto, positionType } from '@/dto/board.res.dto';
 import { cn } from '@/app/utils/tailwind';
-import React, {  useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useStore } from 'zustand';
+import { GameInfoStore } from '@/app/store/GameInfo';
+import RankFormModal from './widgets/RankForm';
+import { modalStore } from '@/context/Modal';
 
 interface ClientWordSearchDivProps {
 	initialBoardData: BoardResDto;
@@ -12,8 +16,9 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 	const [isSelecting, setIsSelecting] = useState(false);
 	const [startPos, setStartPos] = useState<positionType | null>(null);
 	const [endPos, setEndPos] = useState<positionType | null>(null);
-	const { start, } = useCountdownContext();
-
+	const { start, isCountdown, reset, count, defaultCount } = useCountdownContext();
+	const { addPoints } = useStore(GameInfoStore);
+	const { openModal, list } = useStore(modalStore);
 	const { grid, words } = initialBoardData;
 
 	const memoizedWords = useMemo(() => {
@@ -28,8 +33,14 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 
 	useEffect(() => {
 		start();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
-	}, [start]);
+	useEffect(() => {
+		if (isCountdown && count === 0 && list.size === 0) {
+			openModal(<RankFormModal usedTime={defaultCount} solvedCount={memoizedWords.correctedList.length} entireCount={memoizedWords.words.length} id={'rankForm'} />);
+		}
+	}, [isCountdown, count, openModal, memoizedWords.correctedList.length, memoizedWords.words.length, list.size, defaultCount]);
 
 
 	const handleInteractionStart = (row: number, col: number) => {
@@ -49,7 +60,7 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 			memoizedWords.correctedList.push(answer.word);
 			const startButton = document.querySelector(`button[data-row="${start.y}"][data-col="${start.x}"]`);
 			const endButton = document.querySelector(`button[data-row="${end.y}"][data-col="${end.x}"]`);
-
+			addPoints(answer.word.length * 100);
 			if (startButton && endButton) {
 				const startRect = startButton.getBoundingClientRect();
 				const endRect = endButton.getBoundingClientRect();
@@ -61,7 +72,7 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 
 				const line = document.createElement('div');
 				line.style.position = 'absolute';
-				line.style.zIndex = '10';
+				line.style.zIndex = '1';
 				line.style.width = `${Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2)}px`;
 				line.style.height = '8px';
 				line.style.backgroundColor = 'rgba(178, 48, 80, 0.60)';
@@ -75,9 +86,14 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 				line.style.top = `${startY + startRect.height / 2}px`;
 
 				document.body.appendChild(line);
-
-
 			}
+
+			if (memoizedWords.correctedList.length === memoizedWords.words.length) {
+				reset();
+				openModal(<RankFormModal usedTime={defaultCount - count} solvedCount={memoizedWords.correctedList.length} entireCount={memoizedWords.words.length} id={'rankForm'} />);
+			}
+
+
 		}
 
 		setStartPos(null);
@@ -138,11 +154,11 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 
 
 	return (
-		<section className={"md:flex-row flex-col bg-[#EDEDED]  md:mt-10 items-center flex gap-4"}>
-			<div className={"bg-white flex h-max shadow-bottom gap-3 flex-wrap lg:max-w-[40svw] px-4 flex-grow-0 rounded-xl mt-8 md:p-8"}>
+		<section className={"lg:flex-row flex-col bg-[#EDEDED] lg:justify-center lg:mt-10 items-center flex gap-4"}>
+			<div className={"bg-white flex h-max shadow-bottom gap-3 flex-wrap lg:max-w-[40svw] px-4 flex-grow-0 rounded-xl mt-4 lg:mt-8 lg:p-8"}>
 				{memoizedWords.list.map((word) => (
 					<div data-value={word}
-						className={cn("md:text-5xl text-3xl leading-snug text-black font-normal",
+						className={cn("lg:text-5xl text-3xl leading-snug text-black font-normal",
 							memoizedWords.correctedList.find((correctedWord) => correctedWord === word) ? 'line-through text-gray-400' : ''
 						)} key={word}>
 						{word}
@@ -150,9 +166,9 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 				))}
 			</div>
 			<div
-				className={cn("grid size-[80svw] md:size-[36rem] justify-items-center items-top select-none",
+				className={cn("grid size-[80svw] lg:size-[36rem] justify-items-center items-top select-none",
 					"grid-cols-[repeat(8,_10svw)] grid-rows-[repeat(8,_10svw)]",
-					"md:grid-cols-8 md:grid-rows-8"
+					"lg:grid-cols-8 lg:grid-rows-8"
 				)}
 			>
 				{grid.map((row, rowIndex) =>
@@ -161,6 +177,7 @@ const ClientWordSearchDiv: React.FC<ClientWordSearchDivProps> = ({ initialBoardD
 							key={`${rowIndex}-${colIndex}`}
 							data-row={rowIndex}
 							data-col={colIndex}
+							disabled={!isCountdown}
 							className={cn("flex-grow-0 w-[90%] h-[80%] shadow-[0px_7px_0px_0px_rgba(0,0,0,0.25)] rounded-[20px] border border-gray-300 flex items-center justify-center font-bold text-2xl md:text-4xl",
 								`${isCellHighlighted(rowIndex, colIndex) ? 'bg-blue-200 ' : 'bg-[#D7D7D7]'
 								}`)}
