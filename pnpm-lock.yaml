@@ -24,10 +24,10 @@ dependencies:
     specifier: 15.0.4
     version: 15.0.4(react-dom@19.0.0)(react@19.0.0)
   react:
-    specifier: ^19.0.0
+    specifier: 19.0.0
     version: 19.0.0
   react-dom:
-    specifier: ^19.0.0
+    specifier: 19.0.0
     version: 19.0.0(react@19.0.0)
   tailwind-merge:
     specifier: ^2.5.5

@@ -1,8 +1,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import RankList from "./widgets/RankList";
 
-export default function Home() {
+const getRankList = async () => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/highscore`, {
+    method: 'GET',
+    cache: 'no-cache',
+  });
+  const data = await response.json();
+  return data;
+};
+
+export default async function Home() {
+  const rankList = await getRankList();
   return (
     <div className={"flex flex-col h-screen"}>
       <main className={"flex flex-col justify-center h-4/5 bg-primary py-10 lg:py-14"}>
@@ -23,6 +34,7 @@ export default function Home() {
         <Link className={"h-20 mt-auto shadow-bottom  flex items-center justify-center w-1/2 mx-auto bg-white rounded-3xl text-center text-3xl"} href="/play">
           START
         </Link>
+        <RankList list={rankList.slice(0, 4)} />
       </main>
       <footer className={"flex mt-auto p-5 items-center justify-between bg-[#EDEDED] "}>
         <div className={"md:text-lg flex *:text-2xl flex-col items-center"}>
