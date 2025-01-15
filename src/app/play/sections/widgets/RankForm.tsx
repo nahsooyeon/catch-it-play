@@ -44,7 +44,7 @@ const RankFormModal: FunctionComponent<RankFormModalProps> = ({ solvedCount, ent
 
 	const createRank = async (data: CreateRankReqDTO) => {
 		try {
-			await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/highscore`, {
+			await fetch(`/highscore/post`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
